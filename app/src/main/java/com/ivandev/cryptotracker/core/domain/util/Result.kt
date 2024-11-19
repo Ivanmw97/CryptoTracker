@@ -1,4 +1,4 @@
-package com.ivandev.cryptotracker.util
+package com.ivandev.cryptotracker.core.domain.util
 
 typealias DomainError = Error
 
