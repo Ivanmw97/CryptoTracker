@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +40,8 @@ fun PriceChange(
         greenBackground
     }
 
+    val formattedValue = String.format("%.3f", change.value)
+
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(100f))
@@ -59,7 +60,7 @@ fun PriceChange(
             tint = contentColor
         )
         Text(
-            text = "${change.value}%",
+            text = "$formattedValue%",
             color = contentColor,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium
