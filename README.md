@@ -6,7 +6,6 @@
 
 - 🌟 **Real-time tracking**: View live prices of major cryptocurrencies.
 - 📈 **Interactive charts**: Analyze historical trends with detailed graphs.
-- 🔔 **Custom alerts**: Get notified when a currency reaches a specific price.
 - 🌍 **Multilingual support**: Available in multiple languages.
 
 ## Technologies Used
