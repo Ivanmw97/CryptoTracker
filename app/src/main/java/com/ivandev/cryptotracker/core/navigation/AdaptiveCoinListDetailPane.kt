@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@file:OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3AdaptiveApi::class)
 package com.ivandev.cryptotracker.core.navigation
 
 import android.widget.Toast
@@ -56,6 +56,9 @@ fun AdaptiveCoinListDetailPane(
                                 )
                             }
                         }
+                    },
+                    onToggleFavorite = { coinUi -> // New callback connected
+                        viewModel.toggleFavorite(coinUi)
                     }
                 )
             }

@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,6 +36,7 @@ import com.ivandev.cryptotracker.ui.theme.CryptoTrackerTheme
 fun CoinListItem(
     coinUi: CoinUi,
     onClick: () -> Unit,
+    onToggleFavorite: (CoinUi) -> Unit, // New callback for favorites
     modifier: Modifier = Modifier
 ) {
     val contentColor = if (isSystemInDarkTheme()) {
@@ -82,6 +86,23 @@ fun CoinListItem(
             PriceChange(
                 change = coinUi.changePercent24Hr
             )
+
+            Icon(
+                imageVector = if (coinUi.isFavorite) {
+                    Icons.Default.Favorite // Icon when it is a favorite
+                } else {
+                    Icons.Default.FavoriteBorder // Icon when it is not a favorite
+                },
+                contentDescription = if (coinUi.isFavorite) {
+                    "Remove from favorites"
+                } else {
+                    "Add to favorites"
+                },
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .clickable { onToggleFavorite(coinUi) }
+                    .size(24.dp)
+            )
         }
     }
 }
@@ -94,6 +115,7 @@ fun CoinListItemPreview() {
         CoinListItem(
             coinUi = previewCoin,
             onClick = {/* TODO */},
+            onToggleFavorite = {/* TODO */},
             modifier = Modifier.background(
                 MaterialTheme.colorScheme.background
             )
