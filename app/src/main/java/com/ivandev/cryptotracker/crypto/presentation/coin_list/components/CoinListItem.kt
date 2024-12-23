@@ -86,7 +86,7 @@ fun CoinListItem(
             PriceChange(
                 change = coinUi.changePercent24Hr
             )
-
+            Spacer(modifier = Modifier.height(8.dp))
             Icon(
                 imageVector = if (coinUi.isFavorite) {
                     Icons.Default.Favorite // Icon when it is a favorite
