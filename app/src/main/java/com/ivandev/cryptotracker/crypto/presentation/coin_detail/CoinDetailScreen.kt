@@ -94,7 +94,6 @@ fun CoinDetailScreen(
                 modifier = Modifier.size(100.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
