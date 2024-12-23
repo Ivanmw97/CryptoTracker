@@ -10,15 +10,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +51,7 @@ import com.ivandev.cryptotracker.R
 import com.ivandev.cryptotracker.crypto.presentation.coin_detail.components.InfoCard
 import com.ivandev.cryptotracker.crypto.presentation.coin_list.CoinListState
 import com.ivandev.cryptotracker.crypto.presentation.coin_list.components.previewCoin
+import com.ivandev.cryptotracker.crypto.presentation.models.CoinUi
 import com.ivandev.cryptotracker.crypto.presentation.models.toDisplayableNumber
 import com.ivandev.cryptotracker.ui.theme.CryptoTrackerTheme
 import com.ivandev.cryptotracker.ui.theme.greenBackground
@@ -50,6 +59,7 @@ import com.ivandev.cryptotracker.ui.theme.greenBackground
 @Composable
 fun CoinDetailScreen(
     state: CoinListState,
+    onToggleFavorite: (CoinUi) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val contentColor = if(isSystemInDarkTheme()) {
@@ -57,6 +67,9 @@ fun CoinDetailScreen(
     } else {
         Color.Black
     }
+    // Detect orientation
+    val isPortrait = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+
     if (state.isLoading) {
         Box(
             modifier = modifier.fillMaxSize(),
@@ -81,13 +94,32 @@ fun CoinDetailScreen(
                 modifier = Modifier.size(100.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Text(
-                text = coin.name,
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center,
-                color = contentColor
-            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = coin.name,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Start,
+                    color = contentColor
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                if (isPortrait){
+                    IconButton(onClick = { onToggleFavorite(coin) }) {
+                        Icon(
+                            imageVector = if (coin.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = "Toggle Favorite",
+                            tint = if (coin.isFavorite) MaterialTheme.colorScheme.primary else Color.Gray
+                        )
+                    }
+                }
+            }
             Text(
                 text = coin.symbol,
                 fontSize = 20.sp,
@@ -187,10 +219,10 @@ private fun CoinDetailScreenPreview() {
             state = CoinListState(
                 selectedCoin = previewCoin
             ),
+            onToggleFavorite = {/* TODO */},
             modifier = Modifier.background(
                 MaterialTheme.colorScheme.background
             )
         )
     }
-
 }

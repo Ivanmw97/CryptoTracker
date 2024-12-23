@@ -1,6 +1,5 @@
 package com.ivandev.cryptotracker.crypto.presentation.coin_list
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ivandev.cryptotracker.core.domain.util.NetworkError
@@ -14,7 +13,6 @@ import com.ivandev.cryptotracker.crypto.presentation.models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -131,7 +129,6 @@ class CoinListViewModel(
             // Update favorites in Room
             if (updatedCoin.isFavorite) {
                 repository.addFavorite(updatedCoin.id)
-                Log.d("CryptoTracker", "Favoritos actualizados: ${repository.favoriteCryptos.first()}")
             } else {
                 repository.removeFavorite(updatedCoin.id)
             }
@@ -141,9 +138,17 @@ class CoinListViewModel(
                 val updatedCoins = currentState.coins.map {
                     if (it.id == updatedCoin.id) updatedCoin else it
                 }
+                // Also update the `selectedCoin`
+                val updatedSelectedCoin = if (currentState.selectedCoin?.id == updatedCoin.id) {
+                    updatedCoin
+                } else {
+                    currentState.selectedCoin
+                }
+
                 currentState.copy(
                     coins = updatedCoins,
-                    favorites = updatedCoins.filter { it.isFavorite }
+                    favorites = updatedCoins.filter { it.isFavorite },
+                    selectedCoin = updatedSelectedCoin
                 )
             }
         }

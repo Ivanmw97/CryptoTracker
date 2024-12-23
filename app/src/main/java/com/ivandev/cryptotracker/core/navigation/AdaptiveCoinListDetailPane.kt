@@ -65,7 +65,12 @@ fun AdaptiveCoinListDetailPane(
         },
         detailPane = {
             AnimatedPane {
-                CoinDetailScreen(state = state)
+                CoinDetailScreen(
+                    state = state,
+                    onToggleFavorite = { coinUi -> // New callback connected
+                        viewModel.toggleFavorite(coinUi)
+                    }
+                )
             }
         },
         modifier = modifier
