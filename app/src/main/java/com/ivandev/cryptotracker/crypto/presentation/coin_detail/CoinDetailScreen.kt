@@ -113,7 +113,7 @@ fun CoinDetailScreen(
                     IconButton(onClick = { onToggleFavorite(coin) }) {
                         Icon(
                             imageVector = if (coin.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Toggle Favorite",
+                            contentDescription = if (coin.isFavorite) "Favorite Icon" else "Favorite Border Icon",
                             tint = if (coin.isFavorite) MaterialTheme.colorScheme.primary else Color.Gray
                         )
                     }

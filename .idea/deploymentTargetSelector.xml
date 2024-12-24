@@ -5,7 +5,10 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="CryptoDaoTest">
+      <SelectionState runConfigName="CoinDetailScreenTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="coinList_displaysLoadedData()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
