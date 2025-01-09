@@ -10,6 +10,7 @@ import com.ivandev.cryptotracker.crypto.domain.CoinDataSource
 import com.ivandev.cryptotracker.crypto.presentation.coin_detail.DataPoint
 import com.ivandev.cryptotracker.crypto.presentation.models.CoinUi
 import com.ivandev.cryptotracker.crypto.presentation.models.toCoinUi
+import com.ivandev.cryptotracker.crypto.presentation.models.toEntity
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,12 +43,12 @@ class CoinListViewModel(
     val searchQuery = _searchQuery.asStateFlow()
 
     init {
-        // Observar reactivamente los favoritos del repositorio
+        // Observe the repository's favorites reactively
         viewModelScope.launch {
             repository.favoriteCryptos.collect { favoriteCoins ->
                 val favoriteIds = favoriteCoins.map { it.id }.toSet()
 
-                // Actualizar el estado de las monedas marcadas como favoritas
+                // Update the state of coins marked as favorites
                 _state.update { currentState ->
                     val updatedCoins = currentState.coins.map { coin ->
                         coin.copy(isFavorite = favoriteIds.contains(coin.id))
@@ -59,7 +60,7 @@ class CoinListViewModel(
                 }
             }
         }
-        // Combinar la consulta de búsqueda con la lista de monedas para actualizar el estado filtrado
+        // Combine the search query with the coin list to update the filtered state
         viewModelScope.launch {
             combine(_searchQuery, _state) { query, state ->
                 if (query.isEmpty()) {
@@ -132,19 +133,21 @@ class CoinListViewModel(
             _state.update { it.copy(isLoading = true) }
 
             try {
-                // Get the current favorites from Room
+                // Retrieve the favorite coins from the database
                 val favoriteCoins = repository.favoriteCryptos.firstOrNull().orEmpty()
                 val favoriteIds = favoriteCoins.map { it.id }.toSet()
 
-                // Fetch data from the API
+                // Fetch coins from the API
                 coinDataSource.getCoins()
                     .onSuccess { coins ->
-                        // Map the coins from the API and mark the favorites
                         val coinsUi = coins.map { coin ->
-                            coin.toCoinUi().copy(isFavorite = favoriteIds.contains(coin.id))
+                            coin.toCoinUi(isFavorite = favoriteIds.contains(coin.id))
                         }
 
-                        // Update the complete list in the state
+                        // Save all coins to the database (including favorites)
+                        repository.insertCryptos(coinsUi.map { it.toEntity() })
+
+                        // Update the state with the coins
                         _state.update {
                             it.copy(
                                 isLoading = false,
@@ -154,12 +157,10 @@ class CoinListViewModel(
                         }
                     }
                     .onError { error ->
-                        // Handle the error when loading from the API
                         _state.update { it.copy(isLoading = false) }
                         _event.send(CoinListEvent.Error(error))
                     }
             } catch (e: Exception) {
-                // Handle any other errors
                 _state.update { it.copy(isLoading = false) }
                 _event.send(CoinListEvent.Error(NetworkError.UNKNOWN_ERROR))
             }
