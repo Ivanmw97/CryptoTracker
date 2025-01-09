@@ -59,7 +59,8 @@ fun AdaptiveCoinListDetailPane(
                     },
                     onToggleFavorite = { coinUi -> // New callback connected
                         viewModel.toggleFavorite(coinUi)
-                    }
+                    },
+                    viewModel = viewModel
                 )
             }
         },

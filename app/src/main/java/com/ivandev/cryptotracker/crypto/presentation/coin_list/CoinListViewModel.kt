@@ -13,6 +13,8 @@ import com.ivandev.cryptotracker.crypto.presentation.models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -35,6 +37,48 @@ class CoinListViewModel(
             SharingStarted.WhileSubscribed(5000L),
             CoinListState()
         )
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    init {
+        // Observar reactivamente los favoritos del repositorio
+        viewModelScope.launch {
+            repository.favoriteCryptos.collect { favoriteCoins ->
+                val favoriteIds = favoriteCoins.map { it.id }.toSet()
+
+                // Actualizar el estado de las monedas marcadas como favoritas
+                _state.update { currentState ->
+                    val updatedCoins = currentState.coins.map { coin ->
+                        coin.copy(isFavorite = favoriteIds.contains(coin.id))
+                    }
+                    currentState.copy(
+                        coins = updatedCoins,
+                        favorites = updatedCoins.filter { it.isFavorite }
+                    )
+                }
+            }
+        }
+        // Combinar la consulta de búsqueda con la lista de monedas para actualizar el estado filtrado
+        viewModelScope.launch {
+            combine(_searchQuery, _state) { query, state ->
+                if (query.isEmpty()) {
+                    state.coins
+                } else {
+                    state.coins.filter {
+                        it.name.contains(query, ignoreCase = true) ||
+                        it.symbol.contains(query, ignoreCase = true)
+                    }
+                }
+            }.collect { filteredCoins ->
+                _state.update { it.copy(filteredCoins = filteredCoins) }
+            }
+        }
+    }
+
+    fun onSearchQueryChanged(query: String) {
+        _searchQuery.value = query
+    }
 
     private val _event = Channel<CoinListEvent>()
     val event = _event.receiveAsFlow()
@@ -153,4 +197,6 @@ class CoinListViewModel(
             }
         }
     }
+
+    // Update the filtered list based on the search
 }
