@@ -45,7 +45,8 @@ fun CoinListScreen(
         SearchBar(
             query = viewModel.searchQuery.collectAsState().value,
             onQueryChanged = viewModel::onSearchQueryChanged,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         )
         if (state.isLoading) {
             Box(
