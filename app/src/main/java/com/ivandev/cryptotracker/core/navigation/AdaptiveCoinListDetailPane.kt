@@ -56,8 +56,11 @@ fun AdaptiveCoinListDetailPane(
     // Navigator for determining the current pane
     val navigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
-    // Derive whether the BottomNavigationBar should be visible
-    val isBottomBarVisible = navigator.currentDestination?.pane == ListDetailPaneScaffoldRole.List
+    // Determine if the screen is in Landscape mode
+    val isLandscape = LocalContext.current.resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    // Derive visibility of BottomNavigationBar based on orientation and destination
+    val isBottomBarVisible = isLandscape || navigator.currentDestination?.pane == ListDetailPaneScaffoldRole.List
 
     Scaffold(
         bottomBar = {
