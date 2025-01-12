@@ -86,6 +86,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.ktor)
+    implementation(libs.androidx.compose.material)
 
     //For testing
     testImplementation(libs.mockito.core)

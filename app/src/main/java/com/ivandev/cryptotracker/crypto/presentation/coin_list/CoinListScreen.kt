@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,9 +42,21 @@ fun CoinListScreen(
     onAction: (CoinListAction) -> Unit,
     onToggleFavorite: (CoinUi) -> Unit,
     viewModel: CoinListViewModel,
+    showFavoritesOnly: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Column {
+    // Filtering coins based on the `showFavoritesOnly` flag
+    val coinsToDisplay = if (showFavoritesOnly) {
+        state.filteredCoins.filter { it.isFavorite } // Only favorite coins
+    } else {
+        state.filteredCoins // All coins
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(WindowInsets(0.dp).asPaddingValues())
+    ) {
         SearchBar(
             query = viewModel.searchQuery.collectAsState().value,
             onQueryChanged = viewModel::onSearchQueryChanged,
@@ -60,7 +75,8 @@ fun CoinListScreen(
                 modifier = modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(state.filteredCoins) { coinUi ->
+                // Use `coinsToDisplay` to populate the list
+                items(coinsToDisplay) { coinUi ->
                     CoinListItem(
                         coinUi = coinUi,
                         onClick = {
@@ -133,14 +149,15 @@ private fun CoinListScreenPreview() {
         CoinListScreen(
             state = CoinListState(
                 coins = (1..100).map {
-                    previewCoin.copy(id = it.toString())
+                    previewCoin.copy(id = it.toString(), isFavorite = it % 2 == 0)
                 }
             ),
             viewModel = viewModel,
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background),
             onAction = {},
-            onToggleFavorite = {}
+            onToggleFavorite = {},
+            showFavoritesOnly = false
         )
     }
 }
