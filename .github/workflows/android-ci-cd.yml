@@ -3,11 +3,11 @@ name: Android CI/CD
 on:
   push:
     branches:
-      - main
+      - master
       - develop
   pull_request:
     branches:
-      - main
+      - master
       - develop
   workflow_dispatch:
 jobs:
@@ -36,6 +36,13 @@ jobs:
 
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: app/build/reports/tests/testDebugUnitTest/
 
   release:
     name: Build & Sign Release APK
